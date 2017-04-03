@@ -16,17 +16,17 @@ def price_pnr(pnr_id):
     ns = {'common': ''}
     if 'common' in pnr_response.nsmap:
         ns['common'] = pnr_response.nsmap['common']
-    segments = pnr_response.findall('.//common:OriginDestinationOption', namespaces=ns)
+    segments = pnr_response.findall('.//common:OriginDestinationOption/common:FlightSegment', namespaces=ns)
     itinerary = list()
     for segment in segments:
         itinerary.append({
             'MarketingAirline': 'S7',
-            'FlightNumber': 99,
-            'DepartureAirport': 'OVB',
-            'ArrivalAirport': 'DME',
-            'DepartureDateTime': '2017-05-20T01:00:00',
-            'ArrivalDateTime': '2017-05-20T07:00:00',
-            'ResBookDesigCode': 'S',
+            'FlightNumber': segment.attrib['FlightNumber'],
+            'DepartureAirport': segment.find('.//common:DepartureAirport', namespaces=ns).attrib['LocationCode'],
+            'ArrivalAirport': segment.find('.//common:ArrivalAirport', namespaces=ns).attrib['LocationCode'],
+            'DepartureDateTime': segment.attrib['DepartureDateTime'],
+            'ArrivalDateTime': segment.attrib['ArrivalDateTime'],
+            'ResBookDesigCode': segment.find('.//common:BookingClassAvail', namespaces=ns).attrib['ResBookDesigCode'],
         })
     context = {
         'pnr_id': pnr_id,
