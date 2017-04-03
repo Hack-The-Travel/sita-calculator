@@ -44,7 +44,6 @@ def price_pnr(pnr_id):
         'amount': price_fare_breakdowns.find('.//ota:BaseFare', namespaces=ns).attrib['Amount'],
         'taxes': taxes,
     }
-    print price['ADT']
     context = {
         'pnr_id': pnr_id,
         'price_xml': etree.tostring(price_response['ADT']['PTC_FareBreakdowns'], pretty_print=True),
