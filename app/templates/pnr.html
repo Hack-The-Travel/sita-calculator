@@ -6,6 +6,15 @@
 </head>
 <body>
     <h1>PNR {{ pnr_id }} Price information</h1>
+    <h2>ADT</h2>
+    <p>Amount = {{ price['ADT']['amount'] }}</p>
+    <ul>
+        {% for tax in price['ADT']['taxes'] %}
+        <li>Tax {{ tax['code'] }} = {{ tax['amount'] }}</li>
+        {% endfor %}
+    </ul>
+    <pre>{{ price_xml }}</pre>
+    <h3>PNR Response</h3>
     <pre>{{ pnr }}</pre>
 </body>
 </html>

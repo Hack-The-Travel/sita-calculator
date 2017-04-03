@@ -28,8 +28,27 @@ def price_pnr(pnr_id):
             'ArrivalDateTime': segment.attrib['ArrivalDateTime'],
             'ResBookDesigCode': segment.find('.//common:BookingClassAvail', namespaces=ns).attrib['ResBookDesigCode'],
         })
+    price_response = sita.price(itinerary, format='xml')
+    price = dict()
+    price_fare_breakdowns = price_response['ADT']['PTC_FareBreakdowns']
+    ns = {'ota': ''}
+    if 'ota' in price_fare_breakdowns.nsmap:
+        ns['ota'] = price_fare_breakdowns.nsmap['ota']
+    taxes = list()
+    for tax in price_fare_breakdowns.findall('.//ota:Taxes/ota:Tax', namespaces=ns):
+        taxes.append({
+            'code': tax.attrib['TaxCode'],
+            'amount': tax.attrib['Amount'],
+        })
+    price['ADT'] = {
+        'amount': price_fare_breakdowns.find('.//ota:BaseFare', namespaces=ns).attrib['Amount'],
+        'taxes': taxes,
+    }
+    print price['ADT']
     context = {
         'pnr_id': pnr_id,
+        'price_xml': etree.tostring(price_response['ADT']['PTC_FareBreakdowns'], pretty_print=True),
+        'price': price,
         'pnr': etree.tostring(pnr_response, pretty_print=True),
     }
     return render_template('pnr.html', **context)
