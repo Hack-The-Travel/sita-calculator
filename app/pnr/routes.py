@@ -25,7 +25,7 @@ def get_itinerary(pnr_response):
     return itinerary
 
 
-def get_price_breakdowns(price_response, ptcs=['ADT', 'CNN', 'INF']):
+def get_price_breakdowns(price_response, ptcs=('ADT', 'CNN', 'INF',)):
     price_fare_breakdowns = price_response['ADT']['PTC_FareBreakdowns']
     ns = {'ota': ''}
     if 'ota' in price_fare_breakdowns.nsmap:
