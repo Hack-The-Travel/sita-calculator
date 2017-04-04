@@ -6,13 +6,7 @@ from config import sita as sita_config
 from sitaclient import SitaClient
 
 
-@pnr.route('/pnr/<pnr_id>', methods=['GET'])
-def price_pnr(pnr_id):
-    sita = SitaClient(
-        pos=sita_config['pos'],
-        dumps_dir=sita_config['dumps_dir'] if 'dumps_dir' in sita_config else None
-    )
-    pnr_response = sita.read_pnr(pnr_id)
+def get_itinerary(pnr_response):
     ns = {'common': ''}
     if 'common' in pnr_response.nsmap:
         ns['common'] = pnr_response.nsmap['common']
@@ -28,6 +22,17 @@ def price_pnr(pnr_id):
             'ArrivalDateTime': segment.attrib['ArrivalDateTime'],
             'ResBookDesigCode': segment.find('.//common:BookingClassAvail', namespaces=ns).attrib['ResBookDesigCode'],
         })
+    return itinerary
+
+
+@pnr.route('/pnr/<pnr_id>', methods=['GET'])
+def price_pnr(pnr_id):
+    sita = SitaClient(
+        pos=sita_config['pos'],
+        dumps_dir=sita_config['dumps_dir'] if 'dumps_dir' in sita_config else None
+    )
+    pnr_response = sita.read_pnr(pnr_id)
+    itinerary = get_itinerary(pnr_response)
     price_response = sita.price(itinerary, format='xml')
     price = dict()
     price_fare_breakdowns = price_response['ADT']['PTC_FareBreakdowns']
