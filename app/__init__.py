@@ -9,5 +9,5 @@ app_settings = os.getenv(
 )
 app.config.from_object(app_settings)
 
-from app.pnr import pnr
-app.register_blueprint(pnr)
+from app.pnr import pnr_blueprint
+app.register_blueprint(pnr_blueprint)

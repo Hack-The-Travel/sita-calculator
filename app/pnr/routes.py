@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import render_template
-from . import pnr
+from . import pnr_blueprint
 from lxml import etree
 from config import sita as sita_config
 from sitaclient import SitaClient
@@ -48,7 +48,7 @@ def get_price_breakdowns(price_response, ptcs=('ADT', 'CNN', 'INF',)):
     return price
 
 
-@pnr.route('/pnr/<pnr_id>', methods=['GET'])
+@pnr_blueprint.route('/pnr/<pnr_id>', methods=['GET'])
 def price_pnr(pnr_id):
     sita = SitaClient(
         pos=sita_config['pos'],
