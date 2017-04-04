@@ -25,6 +25,26 @@ def get_itinerary(pnr_response):
     return itinerary
 
 
+def get_price_breakdowns(price_response, ptcs=['ADT', 'CNN', 'INF']):
+    price_fare_breakdowns = price_response['ADT']['PTC_FareBreakdowns']
+    ns = {'ota': ''}
+    if 'ota' in price_fare_breakdowns.nsmap:
+        ns['ota'] = price_fare_breakdowns.nsmap['ota']
+    price = dict()
+    for ptc in ptcs:
+        taxes = list()
+        for tax in price_fare_breakdowns.findall('.//ota:Taxes/ota:Tax', namespaces=ns):
+            taxes.append({
+                'code': tax.attrib['TaxCode'],
+                'amount': tax.attrib['Amount'],
+            })
+        price[ptc] = {
+            'amount': price_fare_breakdowns.find('.//ota:BaseFare', namespaces=ns).attrib['Amount'],
+            'taxes': taxes,
+        }
+    return price
+
+
 @pnr.route('/pnr/<pnr_id>', methods=['GET'])
 def price_pnr(pnr_id):
     sita = SitaClient(
@@ -34,25 +54,11 @@ def price_pnr(pnr_id):
     pnr_response = sita.read_pnr(pnr_id)
     itinerary = get_itinerary(pnr_response)
     price_response = sita.price(itinerary, format='xml')
-    price = dict()
-    price_fare_breakdowns = price_response['ADT']['PTC_FareBreakdowns']
-    ns = {'ota': ''}
-    if 'ota' in price_fare_breakdowns.nsmap:
-        ns['ota'] = price_fare_breakdowns.nsmap['ota']
-    taxes = list()
-    for tax in price_fare_breakdowns.findall('.//ota:Taxes/ota:Tax', namespaces=ns):
-        taxes.append({
-            'code': tax.attrib['TaxCode'],
-            'amount': tax.attrib['Amount'],
-        })
-    price['ADT'] = {
-        'amount': price_fare_breakdowns.find('.//ota:BaseFare', namespaces=ns).attrib['Amount'],
-        'taxes': taxes,
-    }
+    price = get_price_breakdowns(price_response)
     context = {
         'pnr_id': pnr_id,
-        'price_xml': etree.tostring(price_response['ADT']['PTC_FareBreakdowns'], pretty_print=True),
         'price': price,
-        'pnr': etree.tostring(pnr_response, pretty_print=True),
+        'price_response_text': etree.tostring(price_response['ADT']['PTC_FareBreakdowns'], pretty_print=True),
+        'pnr_response_text': etree.tostring(pnr_response, pretty_print=True),
     }
     return render_template('pnr.html', **context)
