@@ -32,6 +32,9 @@ def get_price_breakdowns(price_response, ptcs=['ADT', 'CNN', 'INF']):
         ns['ota'] = price_fare_breakdowns.nsmap['ota']
     price = dict()
     for ptc in ptcs:
+        if ptc not in price_response:
+            continue
+        price_fare_breakdowns = price_response[ptc]['PTC_FareBreakdowns']
         taxes = list()
         for tax in price_fare_breakdowns.findall('.//ota:Taxes/ota:Tax', namespaces=ns):
             taxes.append({
