@@ -1,0 +1,6 @@
+*.py[co]
+.DS_*
+
+# Mr Developer
+.idea
+.ve_sita_calc

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PNR</title>
+</head>
+<body>
+    <h1>PNR {{ pnr_id }} - Price information</h1>
+    {% for ptc, price_ptc in price.iteritems() %}
+    <h2>{{ ptc }}</h2>
+    <p>Amount = {{ price_ptc['amount'] }}</p>
+    <ul>
+        {% for tax in price_ptc['taxes'] %}
+        <li>Tax {{ tax['code'] }} = {{ tax['amount'] }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+    <pre>{{ price_response_text }}</pre>
+    <h2>PNR Response</h2>
+    <pre>{{ pnr_response_text }}</pre>
+</body>
+</html>
