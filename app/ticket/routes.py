@@ -3,14 +3,13 @@ from flask import render_template
 from . import ticket_blueprint
 from config import sita as sita_config
 from sitaclient import SitaClient
+from app.utils import cleanup_nsmap
 
 
 def get_ticket_price(ticket_response):
-    ns = ticket_response.nsmap
-    if None in ns:
-        ns['ns'] = ns.pop(None)
-    fare_breakdown = ticket_response.find('.//fares:PassengerFare', namespaces=ns)
-    taxes_breakdown = fare_breakdown.findall('fares:Taxes/fares:Tax', namespaces=ns)
+    nsmap = cleanup_nsmap(ticket_response.nsmap)
+    fare_breakdown = ticket_response.find('.//fares:PassengerFare', namespaces=nsmap)
+    taxes_breakdown = fare_breakdown.findall('fares:Taxes/fares:Tax', namespaces=nsmap)
     taxes = list()
     for tax in taxes_breakdown:
         taxes.append({
@@ -18,8 +17,8 @@ def get_ticket_price(ticket_response):
             'amount': tax.attrib['Amount'],
         })
     return {
-        'total': fare_breakdown.find('fares:TotalFare', namespaces=ns).attrib['Amount'],
-        'fare': fare_breakdown.find('fares:BaseFare', namespaces=ns).attrib['Amount'],
+        'total': fare_breakdown.find('fares:TotalFare', namespaces=nsmap).attrib['Amount'],
+        'fare': fare_breakdown.find('fares:BaseFare', namespaces=nsmap).attrib['Amount'],
         'taxes': taxes,
     }
 
