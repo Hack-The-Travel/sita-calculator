@@ -5,7 +5,7 @@ from config import sita as sita_config
 from sitaclient import SitaClient
 
 
-def get_ticket_price(self, ticket_response):
+def get_ticket_price(ticket_response):
     ns = ticket_response.nsmap
     if None in ns:
         ns['ns'] = ns.pop(None)
