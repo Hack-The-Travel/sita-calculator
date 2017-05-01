@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket</title>
+</head>
+<body>
+    <h1>Ticket {{ ticket_number }}</h1>
+    <p>Total: {{ total }}</p>
+    <p>Fare: {{ fare }}</p>
+    <p>Taxes:</p>
+    <ul>
+    {% for tax in taxes %}
+        <li>{{ tax['code'] }} = {{ tax['amount'] }}</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
