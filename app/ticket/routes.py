@@ -41,6 +41,7 @@ def ticket_price(ticket_number):
         'ticket_number': ticket_number,
         'total': price['total'],
         'fare': price['fare'],
+        'taxes_amount': price['total'] - price['fare'],
         'taxes': price['taxes'],
     }
     return render_template('ticket.html', **context)
