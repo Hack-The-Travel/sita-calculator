@@ -10,15 +10,21 @@ def get_ticket_price(ticket_response):
     nsmap = cleanup_nsmap(ticket_response.nsmap)
     fare_breakdown = ticket_response.find('.//fares:PassengerFare', namespaces=nsmap)
     taxes_breakdown = fare_breakdown.findall('fares:Taxes/fares:Tax', namespaces=nsmap)
+    total = float(fare_breakdown.find('fares:TotalFare', namespaces=nsmap).attrib['Amount'])
+    fare_str = fare_breakdown.find('fares:BaseFare', namespaces=nsmap).attrib['Amount']
+    if fare_str == 'NOFARE':
+        fare = 0.0
+    else:
+        fare = float(fare_str)
     taxes = list()
     for tax in taxes_breakdown:
         taxes.append({
             'code': tax.attrib['TaxCode'],
-            'amount': tax.attrib['Amount'],
+            'amount': float(tax.attrib['Amount']),
         })
     return {
-        'total': fare_breakdown.find('fares:TotalFare', namespaces=nsmap).attrib['Amount'],
-        'fare': fare_breakdown.find('fares:BaseFare', namespaces=nsmap).attrib['Amount'],
+        'total': total,
+        'fare': fare,
         'taxes': taxes,
     }
 
@@ -35,6 +41,7 @@ def ticket_price(ticket_number):
         'ticket_number': ticket_number,
         'total': price['total'],
         'fare': price['fare'],
+        'taxes_amount': price['total'] - price['fare'],
         'taxes': price['taxes'],
     }
     return render_template('ticket.html', **context)
