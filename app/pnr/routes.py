@@ -25,22 +25,26 @@ def get_itinerary(pnr_response):
     return itinerary
 
 
-def get_price_breakdowns(price_response, ptcs=('ADT', 'CNN', 'INF',)):
-    price_fare_breakdowns = price_response['ADT']['PTC_FareBreakdowns']
-    nsmap = cleanup_nsmap(price_fare_breakdowns.nsmap)
+def get_price_breakdowns(price_response):
+    nsmap = cleanup_nsmap(price_response['ADT']['PTC_FareBreakdowns'].nsmap)
     price = dict()
-    for ptc in ptcs:
-        if ptc not in price_response:
-            continue
-        price_fare_breakdowns = price_response[ptc]['PTC_FareBreakdowns']
+    for ptc in price_response:
+        price_breakdown = price_response[ptc]['PTC_FareBreakdowns']
+        total_node = price_breakdown.find('.//ota:TotalFare', namespaces=nsmap)
+        total = float(total_node.attrib['Amount'])
+        fare_node = price_breakdown.find('.//ota:EquivFare', namespaces=nsmap)
+        if fare_node is None:
+            fare_node = price_breakdown.find('.//ota:BaseFare', namespaces=nsmap)
+        fare = float(fare_node.attrib['Amount'])
         taxes = list()
-        for tax in price_fare_breakdowns.findall('.//ota:Taxes/ota:Tax', namespaces=nsmap):
+        for tax in price_breakdown.findall('.//ota:Taxes/ota:Tax', namespaces=nsmap):
             taxes.append({
                 'code': tax.attrib['TaxCode'],
-                'amount': tax.attrib['Amount'],
+                'amount': float(tax.attrib['Amount']),
             })
         price[ptc] = {
-            'amount': price_fare_breakdowns.find('.//ota:BaseFare', namespaces=nsmap).attrib['Amount'],
+            'total': total,
+            'fare': fare,
             'taxes': taxes,
         }
     return price
