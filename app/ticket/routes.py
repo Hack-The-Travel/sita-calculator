@@ -11,7 +11,10 @@ def get_ticket_price(ticket_response):
     nsmap = cleanup_nsmap(ticket_response.nsmap)
     taxes_breakdown = ticket_response.findall('.//fares:Taxes/fares:Tax', namespaces=nsmap)
     total = float(ticket_response.find('.//fares:TotalFare', namespaces=nsmap).attrib['Amount'])
-    fare_str = ticket_response.find('.//fares:BaseFare', namespaces=nsmap).attrib['Amount']
+    fare_node = ticket_response.find('.//fares:EquivFare', namespaces=nsmap)
+    if fare_node is None:
+        fare_node = ticket_response.find('.//fares:BaseFare', namespaces=nsmap)
+    fare_str = fare_node.attrib['Amount']
     if fare_str == 'NOFARE':
         fare = 0.0
     else:
