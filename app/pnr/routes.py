@@ -31,12 +31,12 @@ def get_price_breakdowns(price_response):
     for ptc in price_response:
         price_breakdown = price_response[ptc]['PTC_FareBreakdowns']
         fare_node = price_breakdown.find('.//ota:BaseFare', namespaces=nsmap)
-        fare = fare_node.attrib['Amount']
+        fare = float(fare_node.attrib['Amount'])
         taxes = list()
         for tax in price_breakdown.findall('.//ota:Taxes/ota:Tax', namespaces=nsmap):
             taxes.append({
                 'code': tax.attrib['TaxCode'],
-                'amount': tax.attrib['Amount'],
+                'amount': float(tax.attrib['Amount']),
             })
         price[ptc] = {
             'fare': fare,
