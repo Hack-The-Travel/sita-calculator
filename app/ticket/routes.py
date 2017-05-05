@@ -9,10 +9,9 @@ from app.utils import cleanup_nsmap
 
 def get_ticket_price(ticket_response):
     nsmap = cleanup_nsmap(ticket_response.nsmap)
-    fare_breakdown = ticket_response.find('.//fares:PassengerFare', namespaces=nsmap)
-    taxes_breakdown = fare_breakdown.findall('fares:Taxes/fares:Tax', namespaces=nsmap)
-    total = float(fare_breakdown.find('fares:TotalFare', namespaces=nsmap).attrib['Amount'])
-    fare_str = fare_breakdown.find('fares:BaseFare', namespaces=nsmap).attrib['Amount']
+    taxes_breakdown = ticket_response.findall('.//fares:Taxes/fares:Tax', namespaces=nsmap)
+    total = float(ticket_response.find('.//fares:TotalFare', namespaces=nsmap).attrib['Amount'])
+    fare_str = ticket_response.find('.//fares:BaseFare', namespaces=nsmap).attrib['Amount']
     if fare_str == 'NOFARE':
         fare = 0.0
     else:
