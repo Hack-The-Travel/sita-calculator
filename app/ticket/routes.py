@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask import render_template
 from . import ticket_blueprint
+from lxml import etree
 from config import sita as sita_config
 from sitaclient import SitaClient
 from app.utils import cleanup_nsmap
@@ -43,5 +44,6 @@ def ticket_price(ticket_number):
         'fare': price['fare'],
         'taxes_amount': price['total'] - price['fare'],
         'taxes': price['taxes'],
+        'ticket_response': etree.tostring(ticket_response, pretty_print=True),
     }
     return render_template('ticket.html', **context)
