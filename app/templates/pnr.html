@@ -8,7 +8,8 @@
     <h1>PNR {{ pnr_id }} - Price information</h1>
     {% for ptc, price_ptc in price.iteritems() %}
     <h2>{{ ptc }}</h2>
-    <p>Amount = {{ price_ptc['amount'] }}</p>
+    <p>Total: {{ price_ptc['total'] }}</p>
+    <p>Amount: {{ price_ptc['fare'] }}</p>
     <ul>
         {% for tax in price_ptc['taxes'] %}
         <li>Tax {{ tax['code'] }} = {{ tax['amount'] }}</li>
